@@ -2,7 +2,7 @@ package com.aicodemother.aop;
 
 
 import com.aicodemother.annotation.AuthCheck;
-import com.aicodemother.entity.User;
+import com.aicodemother.model.entity.User;
 import com.aicodemother.exception.BusinessException;
 import com.aicodemother.exception.ErrorCode;
 import com.aicodemother.model.enums.UserRoleEnum;

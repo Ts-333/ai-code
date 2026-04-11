@@ -11,7 +11,7 @@ import com.aicodemother.model.vo.LoginUserVO;
 import com.aicodemother.model.vo.UserVO;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
-import com.aicodemother.entity.User;
+import com.aicodemother.model.entity.User;
 import com.aicodemother.mapper.UserMapper;
 import com.aicodemother.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;

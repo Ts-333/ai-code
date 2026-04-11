@@ -6,7 +6,7 @@ import com.aicodemother.common.BaseResponse;
 import com.aicodemother.common.DeleteRequest;
 import com.aicodemother.common.ResultUtils;
 import com.aicodemother.constant.UserConstant;
-import com.aicodemother.entity.User;
+import com.aicodemother.model.entity.User;
 import com.aicodemother.exception.BusinessException;
 import com.aicodemother.exception.ErrorCode;
 import com.aicodemother.exception.ThrowUtils;

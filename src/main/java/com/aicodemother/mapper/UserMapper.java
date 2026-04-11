@@ -1,7 +1,7 @@
 package com.aicodemother.mapper;
 
 import com.mybatisflex.core.BaseMapper;
-import com.aicodemother.entity.User;
+import com.aicodemother.model.entity.User;
 
 /**
  * 用户 映射层。
