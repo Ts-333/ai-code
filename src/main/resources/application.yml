@@ -33,7 +33,6 @@ server:
       cookie:
         max-age: 2592000
 
-
 springdoc:
   group-configs:
     - group: 'default'
