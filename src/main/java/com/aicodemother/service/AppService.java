@@ -1,5 +1,6 @@
 package com.aicodemother.service;
 
+import com.aicodemother.model.dto.app.AppAddRequest;
 import com.aicodemother.model.dto.app.AppQueryRequest;
 import com.aicodemother.model.entity.App;
 import com.aicodemother.model.entity.User;
@@ -52,6 +53,14 @@ public interface AppService extends IService<App> {
     Flux<String> chatToGenCode(Long appId, String message, User loginUser);
 
     /**
+     *  创建应用
+     * @param appAddRequest
+     * @param loginUser
+     * @return
+     */
+    Long createApp(AppAddRequest appAddRequest, User loginUser);
+
+    /**
      * 应用部署
      *
      * @param appId     应用 ID
@@ -59,4 +68,12 @@ public interface AppService extends IService<App> {
      * @return 可访问的部署地址
      */
     String deployApp(Long appId, User loginUser);
+
+    /**
+     * 异步生成应用截图
+     *
+     * @param appId  应用 ID
+     * @param appUrl 应用访问地址
+     */
+    void generateAppScreenshotAsync(Long appId, String appUrl);
 }

@@ -73,7 +73,7 @@ public class AiCodeGeneratorFacade {
         if (codeGenTypeEnum == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "生成类型不能为空");
         }
-        // 根据 appId获取相对于的 Ai服务实例
+        // 根据 appId 获取相对于的 Ai服务实例
         AiCodeGeneratorService aiCodeGeneratorService = aiCodeGeneratorServiceFactory.getAicodeGeneratorService(appId,codeGenTypeEnum);
         return switch (codeGenTypeEnum) {
             case VUE_PROJECT -> {
