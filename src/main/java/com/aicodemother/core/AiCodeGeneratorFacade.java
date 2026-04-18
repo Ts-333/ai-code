@@ -5,13 +5,12 @@ import com.aicodemother.ai.AiCodeGeneratorService;
 import com.aicodemother.ai.AiCodeGeneratorServiceFactory;
 import com.aicodemother.ai.model.HtmlCodeResult;
 import com.aicodemother.ai.model.MultiFileCodeResult;
-import com.aicodemother.core.parser.CodeParser;
+import com.aicodemother.core.builder.VueProjectBuilder;
 import com.aicodemother.core.parser.CodeParserExecutor;
 import com.aicodemother.core.saver.CodeFileSaverExecutor;
 import com.aicodemother.exception.BusinessException;
 import com.aicodemother.exception.ErrorCode;
 import com.aicodemother.model.enums.CodeGenTypeEnum;
-import dev.langchain4j.service.TokenStream;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,7 +29,8 @@ public class AiCodeGeneratorFacade {
     @Resource
     private AiCodeGeneratorServiceFactory aiCodeGeneratorServiceFactory;
 
-
+    @Resource
+    private VueProjectBuilder vueProjectBuilder;
 
 
     /**
@@ -94,6 +94,15 @@ public class AiCodeGeneratorFacade {
             }
         };
     }
+
+    /**
+     * 将 TokenStream 转换为 Flux<String>，并传递工具调用信息
+     *
+     * @param tokenStream TokenStream 对象
+     * @param appId       应用 ID
+     * @return Flux<String> 流式响应
+     */
+    // TODO 待完善
 
 
 

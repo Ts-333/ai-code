@@ -27,9 +27,13 @@ class CodeGenWorkflowTest {
     }
 
     @Test
-    void executeWorkflowWithFlux() {
+    void testCorporateWorkflow() {
+        WorkflowContext result = new CodeGenWorkflow().executeWorkflow("创建企业官网，展示公司形象和业务介绍");
+        Assertions.assertNotNull(result);
+        System.out.println("生成类型: " + result.getGenerationType());
+        System.out.println("生成的代码目录: " + result.getGeneratedCodeDir());
+        System.out.println("构建结果目录: " + result.getBuildResultDir());
     }
-
     @Test
     void executeWorkflowWithSse() {
     }

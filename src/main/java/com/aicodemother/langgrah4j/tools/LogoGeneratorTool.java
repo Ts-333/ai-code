@@ -6,6 +6,7 @@ import com.aicodemother.langgrah4j.model.enums.ImageCategoryEnum;
 import com.alibaba.dashscope.aigc.imagesynthesis.ImageSynthesis;
 import com.alibaba.dashscope.aigc.imagesynthesis.ImageSynthesisParam;
 import com.alibaba.dashscope.aigc.imagesynthesis.ImageSynthesisResult;
+import com.alibaba.dashscope.utils.Constants;
 import dev.langchain4j.agent.tool.P;
 import dev.langchain4j.agent.tool.Tool;
 import lombok.extern.slf4j.Slf4j;
@@ -26,8 +27,12 @@ public class LogoGeneratorTool {
     @Value("${dashscope.api-key:}")
     private String dashScopeApiKey;
 
-    @Value("${dashscope.image-model:wanx2.1-t2i-plus}")
+    @Value("${dashscope.image-model}")
     private String imageModel;
+
+    static {
+        Constants.baseHttpApiUrl = "https://dashscope.aliyuncs.com/api/v1";
+    }
 
     @Tool("根据描述生成 Logo 设计图片，用于网站品牌标识")
     public List<ImageResource> generateLogos(@P("Logo 设计描述，如名称、行业、风格等，尽量详细") String description) {
@@ -41,6 +46,7 @@ public class LogoGeneratorTool {
                     .prompt(logoPrompt)
                     .size("512*512")
                     .n(1) // 生成 1 张足够，因为 AI 不知道哪张最好
+                    .style("<watercolor>")
                     .build();
             ImageSynthesis imageSynthesis = new ImageSynthesis();
             ImageSynthesisResult result = imageSynthesis.call(param);
