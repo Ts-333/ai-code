@@ -1,16 +1,24 @@
 package com.aicodemother.core;
 
 
+import cn.hutool.json.JSONUtil;
 import com.aicodemother.ai.AiCodeGeneratorService;
 import com.aicodemother.ai.AiCodeGeneratorServiceFactory;
 import com.aicodemother.ai.model.HtmlCodeResult;
 import com.aicodemother.ai.model.MultiFileCodeResult;
+import com.aicodemother.ai.model.message.AiResponseMessage;
+import com.aicodemother.ai.model.message.ToolExecutedMessage;
+import com.aicodemother.ai.model.message.ToolRequestMessage;
+import com.aicodemother.constant.AppConstant;
 import com.aicodemother.core.builder.VueProjectBuilder;
 import com.aicodemother.core.parser.CodeParserExecutor;
 import com.aicodemother.core.saver.CodeFileSaverExecutor;
 import com.aicodemother.exception.BusinessException;
 import com.aicodemother.exception.ErrorCode;
 import com.aicodemother.model.enums.CodeGenTypeEnum;
+import dev.langchain4j.model.chat.response.ChatResponse;
+import dev.langchain4j.service.TokenStream;
+import dev.langchain4j.service.tool.ToolExecution;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -77,8 +85,8 @@ public class AiCodeGeneratorFacade {
         AiCodeGeneratorService aiCodeGeneratorService = aiCodeGeneratorServiceFactory.getAicodeGeneratorService(appId,codeGenTypeEnum);
         return switch (codeGenTypeEnum) {
             case VUE_PROJECT -> {
-                Flux<String> codeStream = aiCodeGeneratorService.generateVueProjectCodeStream(appId, userMessage);
-                yield processCodeStream(codeStream,CodeGenTypeEnum.VUE_PROJECT, appId);
+                TokenStream tokenStream = aiCodeGeneratorService.generateVueProjectCodeStream(appId, userMessage);
+                yield processTokenStream(tokenStream,appId);
             }
             case HTML -> {
                 Flux<String> codeStream = aiCodeGeneratorService.generateHtmlCodeStream(userMessage);
@@ -102,7 +110,36 @@ public class AiCodeGeneratorFacade {
      * @param appId       应用 ID
      * @return Flux<String> 流式响应
      */
-    // TODO 待完善
+    private Flux<String> processTokenStream(TokenStream tokenStream, Long appId) {
+        return Flux.create(sink -> {
+            tokenStream.onPartialResponse((String partialResponse) -> {
+                        // 给返回的信息标记为 Ai信息
+                        AiResponseMessage aiResponseMessage = new AiResponseMessage(partialResponse);
+                        sink.next(JSONUtil.toJsonStr(aiResponseMessage));
+                    })
+                    .onPartialToolExecutionRequest((index, toolExecutionRequest) -> {
+                        // 给返回的信息标记为 工具调用信息
+                        ToolRequestMessage toolRequestMessage = new ToolRequestMessage(toolExecutionRequest);
+                        sink.next(JSONUtil.toJsonStr(toolRequestMessage));
+                    })
+                    .onToolExecuted((ToolExecution toolExecution) -> {
+                        // 给返回的信息标记为 工具执行完成后的信息
+                        ToolExecutedMessage toolExecutedMessage = new ToolExecutedMessage(toolExecution);
+                        sink.next(JSONUtil.toJsonStr(toolExecutedMessage));
+                    })
+                    .onCompleteResponse((ChatResponse response) -> {
+                        // 执行 Vue 项目构建（同步执行，确保预览时项目已就绪）
+                        String projectPath = AppConstant.CODE_OUTPUT_ROOT_DIR + "/vue_project_" + appId;
+                        vueProjectBuilder.buildProject(projectPath);
+                        sink.complete();
+                    })
+                    .onError((Throwable error) -> {
+                        error.printStackTrace();
+                        sink.error(error);
+                    })
+                    .start();
+        });
+    }
 
 
 

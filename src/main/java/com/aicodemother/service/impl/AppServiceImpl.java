@@ -11,6 +11,7 @@ import com.aicodemother.ai.AiCodeGenTypeRoutingServiceFactory;
 import com.aicodemother.constant.AppConstant;
 import com.aicodemother.core.AiCodeGeneratorFacade;
 import com.aicodemother.core.builder.VueProjectBuilder;
+import com.aicodemother.core.handler.StreamHandlerExecutor;
 import com.aicodemother.exception.BusinessException;
 import com.aicodemother.exception.ErrorCode;
 import com.aicodemother.exception.ThrowUtils;
@@ -23,6 +24,8 @@ import com.aicodemother.model.enums.ChatHistoryMessageTypeEnum;
 import com.aicodemother.model.enums.CodeGenTypeEnum;
 import com.aicodemother.model.vo.AppVO;
 import com.aicodemother.model.vo.UserVO;
+import com.aicodemother.monitor.MonitorContext;
+import com.aicodemother.monitor.MonitorContextHolder;
 import com.aicodemother.service.AppService;
 import com.aicodemother.service.ChatHistoryService;
 import com.aicodemother.service.ScreenshotService;
@@ -62,6 +65,9 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App>  implements AppS
 
     @Resource
     private ScreenshotService screenshotService;
+
+    @Resource
+    private StreamHandlerExecutor streamHandlerExecutor;
 
     @Resource
     private AiCodeGenTypeRoutingServiceFactory aiCodeGenTypeRoutingServiceFactory;
@@ -159,23 +165,21 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App>  implements AppS
         }
         // 5. 在与AI对话前, 添加对话历史
         chatHistoryService.addChatMessage(appId, message, ChatHistoryMessageTypeEnum.USER.getValue(), loginUser.getId());
-        // 6. 与AI对话
+        // 6. 设置监控上下文（用户 ID 和应用 ID）
+        MonitorContextHolder.setContext(
+                MonitorContext.builder()
+                        .userId(loginUser.getId().toString())
+                        .appId(appId.toString())
+                        .build()
+        );
+        // 7. 调用 AI 生成代码（流式）
         Flux<String> codeStream = aiCodeGeneratorFacade.generateAndSaveCodeStream(message, codeGenTypeEnum, appId);
-        StrBuilder aiResponseBuilder = new StrBuilder();
-        return codeStream.map(chunk -> {
-            //收集Ai响应
-            aiResponseBuilder.append(chunk);
-            return chunk;
-        }).doOnComplete(()->{
-            String aiResponse = aiResponseBuilder.toString();
-            if (StrUtil.isNotBlank(aiResponse)) {
-                chatHistoryService.addChatMessage(appId, aiResponse, ChatHistoryMessageTypeEnum.AI.getValue(), loginUser.getId());
-            }
-        }).doOnError(error ->{
-            //AI回复失败也要记录错误信息
-            String errorMessage ="AI回复失败: " + error.getMessage();
-            chatHistoryService.addChatMessage(appId, errorMessage, ChatHistoryMessageTypeEnum.AI.getValue(), loginUser.getId());
-        });
+        // 8. 收集 AI 响应的内容，并且在完成后保存记录到对话历史
+        return streamHandlerExecutor.doExecute(codeStream, chatHistoryService, appId, loginUser, codeGenTypeEnum)
+                .doFinally(signalType -> {
+                    // 流结束时清理（无论成功/失败/取消）
+                    MonitorContextHolder.clearContext();
+                });
     }
 
 
