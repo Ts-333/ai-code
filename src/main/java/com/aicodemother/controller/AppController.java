@@ -17,6 +17,8 @@ import com.aicodemother.model.entity.App;
 import com.aicodemother.model.entity.User;
 import com.aicodemother.model.enums.CodeGenTypeEnum;
 import com.aicodemother.model.vo.AppVO;
+import com.aicodemother.ratelimter.annotation.RateLimit;
+import com.aicodemother.ratelimter.enums.RateLimitType;
 import com.aicodemother.service.AppService;
 import com.aicodemother.service.ProjectDownloadService;
 import com.aicodemother.service.UserService;
@@ -64,6 +66,7 @@ public class AppController {
      * @return
      */
     @GetMapping(value = "/chat/gen/code", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @RateLimit(limitType = RateLimitType.USER, rate = 5, rateInterval = 60, message = "AI 对话请求过于频繁，请稍后再试")
     public Flux<ServerSentEvent<String>> chatToGenCode(@RequestParam Long appId,
                                                        @RequestParam String message,
                                                        HttpServletRequest request) {
@@ -272,7 +275,7 @@ public class AppController {
      */
     @PostMapping("/good/list/page/vo")
     @Cacheable(value = "good_app_page",
-            key = "T(com.aicodemother.utils.CacheKeyUtils).generateKey(appQueryRequest)",
+            key = "T(com.aicodemother.utils.CacheKeyUtils).generateKey(#appQueryRequest)",
             condition = "#appQueryRequest.priority < 10"    //前10页才会被缓存
                     )
 
