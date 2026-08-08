@@ -77,20 +77,21 @@ public class AppController {
         User loginUser = userService.getLoginUser(request);
         // 调用服务生成代码（SSE 流式返回）
         Flux<String> contentFlux = appService.chatToGenCode(appId, message, loginUser);
-        return contentFlux
-                .map(chunk -> {
-                    Map<String, String> wrapper = Map.of("d", chunk);
-                    String jsonData = JSONUtil.toJsonStr(wrapper);
-                    return ServerSentEvent.<String>builder()
-                            .data(jsonData)
-                            .build();
+
+        return contentFlux                // 返回一个Flux流，用于处理内容流
+                .map(chunk -> {            // 对每个数据块进行转换处理
+                    Map<String, String> wrapper = Map.of("d", chunk);  // 创建一个简单的Map包装器，将数据块放入"d"键中
+                    String jsonData = JSONUtil.toJsonStr(wrapper);       // 将Map转换为JSON字符串
+                    return ServerSentEvent.<String>builder()           // 构建一个ServerSentEvent事件
+                            .data(jsonData)                            // 设置事件数据为JSON字符串
+                            .build();                                  // 构建完成并返回事件
                 })
-                .concatWith(Mono.just(
+                .concatWith(Mono.just(     // 在Flux流末尾连接一个Mono
                         // 发送结束事件
-                        ServerSentEvent.<String>builder()
-                                .event("done")
-                                .data("")
-                                .build()
+                        ServerSentEvent.<String>builder()   // 构建一个ServerSentEvent作为结束事件
+                                .event("done")              // 设置事件类型为"done"并给前端发送,表示已经完成传输
+                                .data("")                   // 设置事件数据为空字符串
+                                .build()                    // 构建完成并返回结束事件
                 ));
     }
 

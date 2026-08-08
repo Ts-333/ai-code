@@ -14,17 +14,22 @@ public class HtmlCodeParser implements CodeParser<HtmlCodeResult>{
     private static final Pattern HTML_CODE_PATTERN = Pattern.compile("```html\\s*\\n([\\s\\S]*?)```", Pattern.CASE_INSENSITIVE);
 
     @Override
+    /**
+     * 解析代码内容并返回HTML代码结果
+     * @param codeContent 需要解析的代码内容字符串
+     * @return HtmlCodeResult 包含解析后的HTML代码的结果对象
+     */
     public HtmlCodeResult parseCode(String codeContent) {
         HtmlCodeResult result = new HtmlCodeResult();
         // 解析HTML代码
         String htmlCode = extractHtmlCode(codeContent);
         if (htmlCode != null && !htmlCode.trim().isEmpty()) {
-            result.setHtmlCode(htmlCode.trim());
+            result.setHtmlCode(htmlCode.trim());  // 设置提取的HTML代码到结果对象中
         } else {
             // 如果没有找到代码块，将整个内容作为HTML
-            result.setHtmlCode(codeContent.trim());
+            result.setHtmlCode(codeContent.trim());  // 设置原始内容作为HTML代码到结果对象中
         }
-        return result;
+        return result;  // 返回包含HTML代码的结果对象
     }
 
     /**

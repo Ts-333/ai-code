@@ -48,9 +48,10 @@ public interface AiCodeGeneratorService {
     @SystemMessage(fromResource = "prompt/codegen-multi-file-system-prompt.txt")
     Flux<String> generateMultiFileCodeStream(String userMessage);
 
+
     /**
      * 生成 Vue 项目代码（流式）
-     *
+     * @param appId Vue项目代码比较复杂，需要appId来进行多轮对话
      * @param userMessage 用户提示词
      * @return AI 的输出结果
      */

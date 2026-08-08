@@ -110,7 +110,7 @@ public class OpenAiStreamingResponseBuilder {
         }
 
         if (delta.toolCalls() != null) {
-            System.out.println("OLOLO " + delta.toolCalls()); // TODO
+//            System.out.println("OLOLO " + delta.toolCalls()); // TODO 暂时不在控制台输出相关内容
 
             for (ToolCall toolCall : delta.toolCalls()) {
 

@@ -56,8 +56,8 @@ public class AiCodeGeneratorFacade {
         AiCodeGeneratorService aiCodeGeneratorService = aiCodeGeneratorServiceFactory.getAicodeGeneratorService(appId,codeGenTypeEnum);
         return switch (codeGenTypeEnum) {
             case HTML -> {
-                HtmlCodeResult result = aiCodeGeneratorService.generateHtmlCode(userMessage);
-                yield CodeFileSaverExecutor.executeSaver(result, CodeGenTypeEnum.HTML,appId);
+                HtmlCodeResult result = aiCodeGeneratorService.generateHtmlCode(userMessage);   //与大模型交互生成相关代码
+                yield CodeFileSaverExecutor.executeSaver(result, CodeGenTypeEnum.HTML,appId);   //保存代码
             }
             case MULTI_FILE -> {
                 MultiFileCodeResult result = aiCodeGeneratorService.generateMultiFileCode(userMessage);
