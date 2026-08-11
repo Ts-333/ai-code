@@ -183,12 +183,18 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App>  implements AppS
     }
 
 
+    /**
+     *   创建应用方法
+      * @param appAddRequest 应用添加请求对象，包含应用初始化所需参数
+     * @param loginUser 当前登录用户信息
+     * @return 返回创建成功的应用ID
+     */
     @Override
     public Long createApp(AppAddRequest appAddRequest, User loginUser) {
-        // 参数校验
+        // 参数校验：检查初始化prompt是否为空
         String initPrompt = appAddRequest.getInitPrompt();
         ThrowUtils.throwIf(StrUtil.isBlank(initPrompt), ErrorCode.PARAMS_ERROR, "初始化 prompt 不能为空");
-        // 构造入库对象
+        // 构造入库对象：将请求参数复制到App实体对象
         App app = new App();
         BeanUtil.copyProperties(appAddRequest, app);
         app.setUserId(loginUser.getId());

@@ -23,15 +23,9 @@ import java.nio.file.StandardOpenOption;
 public class FileModifyTool extends BaseTool {
 
     @Tool("修改文件内容，用新内容替换指定的旧内容")
-    public String modifyFile(
-            @P("文件的相对路径")
-            String relativeFilePath,
-            @P("要替换的旧内容")
-            String oldContent,
-            @P("替换后的新内容")
-            String newContent,
-            @ToolMemoryId Long appId
-    ) {
+    public String modifyFile(@P("文件的相对路径")String relativeFilePath,@P("要替换的旧内容")String oldContent,
+                             @P("替换后的新内容")String newContent,@ToolMemoryId Long appId)
+    {
         try {
             Path path = Paths.get(relativeFilePath);
             if (!path.isAbsolute()) {

@@ -23,6 +23,7 @@ import static org.bsc.langgraph4j.StateGraph.START;
 import static org.bsc.langgraph4j.action.AsyncEdgeAction.edge_async;
 
 /**
+ * 基于 并行工作流 ParallelWorkflow 的代码生成工作流
  * 并发执行的代码生成工作流
  */
 @Slf4j
@@ -106,9 +107,11 @@ public class CodeGenConcurrentWorkflow {
                 .setWorkQueue(new LinkedBlockingQueue<>(100))
                 .setThreadFactory(ThreadFactoryBuilder.create().setNamePrefix("Parallel-Image-Collect").build())
                 .build();
+        // 配置并行节点执行器(指定节点开始并发)
         RunnableConfig runnableConfig = RunnableConfig.builder()
                 .addParallelNodeExecutor("image_plan", pool)
                 .build();
+        // 执行工作流
         for (NodeOutput<MessagesState<String>> step : workflow.stream(
                 Map.of(WorkflowContext.WORKFLOW_CONTEXT_KEY, initialContext),
                 runnableConfig)) {

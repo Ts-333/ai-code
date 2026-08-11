@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 
 @EnableCaching
-@SpringBootApplication(exclude = {RedisEmbeddingStoreAutoConfiguration.class})    // 关闭RedisChatMemoryStore embedding的自动装配
+@SpringBootApplication(exclude = {RedisEmbeddingStoreAutoConfiguration.class})    // 关闭RedisChatMemoryStore embedding自动装配的向量模型
 @MapperScan("com.aicodemother.mapper")
 public class AiCodeMotherApplication {
 

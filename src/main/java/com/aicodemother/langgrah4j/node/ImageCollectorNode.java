@@ -20,6 +20,7 @@ import java.util.concurrent.CompletableFuture;
 import static org.bsc.langgraph4j.action.AsyncNodeAction.node_async;
 
 /**
+ * 基于 CompleteFuture 的图片收集节点（并发）
  * 图片收集节点（并发）
  */
 @Slf4j

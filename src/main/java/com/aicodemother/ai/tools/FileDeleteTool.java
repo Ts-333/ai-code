@@ -22,11 +22,8 @@ import java.nio.file.Paths;
 public class FileDeleteTool extends BaseTool {
 
     @Tool("删除指定路径的文件")
-    public String deleteFile(
-            @P("文件的相对路径")
-            String relativeFilePath,
-            @ToolMemoryId Long appId
-    ) {
+    public String deleteFile(@P("文件的相对路径")String relativeFilePath,@ToolMemoryId Long appId)
+    {
         try {
             Path path = Paths.get(relativeFilePath);
             if (!path.isAbsolute()) {

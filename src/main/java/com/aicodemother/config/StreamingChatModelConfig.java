@@ -37,7 +37,7 @@ public class StreamingChatModelConfig {
      * 流式模型
      */
     @Bean
-    @Scope("prototype")
+    @Scope("prototype") // 多例模式
     public StreamingChatModel streamingChatModelPrototype() {
         return OpenAiStreamingChatModel.builder()
                 .apiKey(apiKey)

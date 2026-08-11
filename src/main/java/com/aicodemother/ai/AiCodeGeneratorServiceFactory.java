@@ -47,17 +47,6 @@ public class AiCodeGeneratorServiceFactory {
     @Resource
     private ToolManager toolManager;
 
-    @Lookup("reasoningStreamingChatModelPrototype")
-    public StreamingChatModel getReasoningStreamingChatModel() {
-        return null;
-    }
-
-    @Lookup("streamingChatModelPrototype")
-    public StreamingChatModel getOpenAiStreamingChatModel() {
-        return null;
-    }
-
-
     /**
      * AI 服务实例缓存
      * 缓存策略：
@@ -70,7 +59,7 @@ public class AiCodeGeneratorServiceFactory {
             .expireAfterWrite(Duration.ofMinutes(30))   // 写入后 30 分钟过期
             .expireAfterAccess(Duration.ofMinutes(10))  // 访问后 10 分钟过期
             .removalListener((key, value, cause)->
-                    log.info("AI 服务实例被移除: appId: {}, 原因: {}", key, cause))
+                    log.info("Redis缓存的 AI服务实例被移除: 缓存键为: {}, 原因: {}", key, cause))
             .build();
 
     /**
@@ -84,6 +73,7 @@ public class AiCodeGeneratorServiceFactory {
 
     /**
      *  根据 appid 获取 Ai 服务
+     *  先从缓存中获取 Ai 服务实例，如果不存在则创建新的实例
      * @param appId
      * @return
      */
@@ -113,8 +103,11 @@ public class AiCodeGeneratorServiceFactory {
         return switch (codeGenType) {
             // Vue 项目生成，使用工具调用和推理模型
             case VUE_PROJECT -> {
+                // 通过 @Lookup 注解获取多例模型 //TODO：测试通过其它方法获取多例模型
+                // StreamingChatModel reasoningStreamingChatModel = getReasoningStreamingChatModel();
+
                 // 使用多例模式的 StreamingChatModel 解决并发问题
-                StreamingChatModel reasoningStreamingChatModel = SpringContextUtil.getBean("reasoningStreamingChatModelPrototype", StreamingChatModel.class);
+                 StreamingChatModel reasoningStreamingChatModel = SpringContextUtil.getBean("reasoningStreamingChatModelPrototype", StreamingChatModel.class);
                 yield AiServices.builder(AiCodeGeneratorService.class)
                         .chatModel(chatModel)
                         .streamingChatModel(reasoningStreamingChatModel)
@@ -132,11 +125,8 @@ public class AiCodeGeneratorServiceFactory {
             }
             // HTML 和 多文件生成，使用流式对话模型
             case HTML, MULTI_FILE -> {
-                // 通过 @Lookup 注解获取多例模型 //TODO：测试通过其它方法获取多例模型
-                StreamingChatModel openAiStreamingChatModel = getOpenAiStreamingChatModel();
-
-                // 使用多例模式的 StreamingChatModel 解决并发问题 //TODO：暂时注释掉 用于测试上述条件
-//                StreamingChatModel openAiStreamingChatModel = SpringContextUtil.getBean("streamingChatModelPrototype", StreamingChatModel.class);
+                // 使用多例模式的 StreamingChatModel 解决并发问题
+                StreamingChatModel openAiStreamingChatModel = SpringContextUtil.getBean("streamingChatModelPrototype", StreamingChatModel.class);
                 yield AiServices.builder(AiCodeGeneratorService.class)
                         .chatModel(chatModel)
                         .streamingChatModel(openAiStreamingChatModel)

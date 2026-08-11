@@ -21,10 +21,7 @@ import java.nio.file.Paths;
 public class FileReadTool extends BaseTool {
 
     @Tool("读取指定路径的文件内容")
-    public String readFile(
-            @P("文件的相对路径")
-            String relativeFilePath,
-            @ToolMemoryId Long appId
+    public String readFile(@P("文件的相对路径")String relativeFilePath,@ToolMemoryId Long appId
     ) {
         try {
             Path path = Paths.get(relativeFilePath);

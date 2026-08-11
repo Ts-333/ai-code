@@ -30,7 +30,7 @@ public class ToolManager {
     /**
      * 初始化工具映射
      */
-    @PostConstruct
+    @PostConstruct //依赖注入完成后执行
     public void initTools() {
         for (BaseTool tool : tools) {
             toolMap.put(tool.getToolName(), tool);

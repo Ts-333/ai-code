@@ -66,7 +66,7 @@ public class ScreenshotServiceImpl implements ScreenshotService {
 
     /**
      * 生成截图的对象存储键
-     * 格式：/screenshots/2025/07/31/filename.jpg
+     * 格式：/screenshots/2026/07/31/filename.jpg
      */
     private String generateScreenshotKey(String fileName) {
         String datePath = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
